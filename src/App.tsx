@@ -1,26 +1,62 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Button from '@material-ui/core/Button';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { useSignalState } from "./Hooks/SignalState";
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+
+const useStyles = makeStyles((theme: Theme) =>
+	createStyles({
+		card: {
+			maxWidth: 345
+		},
+		textField: {
+			marginLeft: theme.spacing(1),
+			marginRight: theme.spacing(1),
+			width: 200
+		}
+	}),
+);
+
+interface State {
+	group: string;
+}
 
 const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const classes = useStyles();
+	const { counter, incrementAsync, decrementAsync, joinAsync, leaveAsync } = useSignalState();
+
+	const [values, setValues] = useState<State>({
+		group: "Cat in the Hat",
+	});
+
+	const handleChange = (name: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
+		setValues({ ...values, [name]: event.target.value });
+	};
+
+	return (<Card className={classes.card}>
+		<CardActionArea>
+			<CardContent>
+				<Typography gutterBottom variant="h5" component="h2">Current Count</Typography>
+				<Typography variant="body2" color="textSecondary" component="p">{counter.counter}</Typography>
+				<form noValidate autoComplete="off">
+					<TextField id="standard-name" label="Name" className={classes.textField} value={values.group} margin="normal" onChange={handleChange("group")} />
+				</form>
+			</CardContent>
+		</CardActionArea>
+		<CardActions>
+			<Button size="small" color="primary" onClick={() => incrementAsync()}>Increment</Button>
+			<Button size="small" color="primary" onClick={() => decrementAsync()}>Decrement</Button>
+
+			<Button size="small" color="primary" onClick={() => joinAsync(values.group)}>Join</Button>
+			<Button size="small" color="primary" onClick={() => leaveAsync(values.group)}>Leave</Button>
+		</CardActions>
+	</Card>
+	);
 }
 
 export default App;
