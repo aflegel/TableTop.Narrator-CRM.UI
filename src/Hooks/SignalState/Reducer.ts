@@ -1,5 +1,9 @@
 import { SignalState } from "./State";
-import { SignalStateActions, IncrementAction, DecrementAction, MembershipAction } from "./Actions";
+import { Increment, IncrementAction } from "./Actions/Increment";
+import { Decrement, DecrementAction } from "./Actions/Decrement";
+import { Membership, MembershipAction } from "./Actions/Membership";
+
+export type SignalStateActions = Increment | Decrement | Membership;
 
 export const Reducer = (state: SignalState, action: SignalStateActions): SignalState => {
 

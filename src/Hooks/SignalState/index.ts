@@ -2,7 +2,9 @@ import { useReducer, useRef, useEffect, useCallback } from "react";
 import { Reducer } from "./Reducer";
 import { InitialState } from "./State";
 import { HubConnectionBuilder } from "@aspnet/signalr";
-import { incrementAction, decrementAction, membershipAction } from "./Actions";
+import { incrementAction } from "./Actions/Increment";
+import { decrementAction } from "./Actions/Decrement";
+import { membershipAction } from "./Actions/Membership";
 
 export const useSignalState = () => {
 	const [counter, dispatch] = useReducer(Reducer, InitialState);
@@ -12,24 +14,15 @@ export const useSignalState = () => {
 	if (connection.current.state !== "Connected")
 		connection.current.start();
 
-	const memberListener = useCallback(data => {
+	const incrementListener = useCallback(data => {
 		console.log(data);
 	}, []);
 
 	useEffect(() => {
-		connection.current.on("JoinGroup", memberListener);
-		connection.current.on("LeftGroup", memberListener);
-	}, [memberListener]);
-
-	const incrementListener = useCallback(data => {
-		dispatch(incrementAction());
-	}, []);
-
-	useEffect(() => {
-		connection.current.on("IncrementCounter", incrementListener);
+		connection.current.on("Sync", incrementListener);
 	}, [incrementListener]);
 
-	const decrementListener = useCallback(data => {
+	const decrementListener = useCallback(() => {
 		dispatch(decrementAction());
 	}, []);
 
@@ -41,9 +34,7 @@ export const useSignalState = () => {
 		if (connection.current.state !== "Connected")
 			await connection.current.start();
 
-		connection.current.send("IncrementCounter", counter.group);
-
-		dispatch(incrementAction());
+		connection.current.send("Update", "83F023E9-B743-4525-97B8-D6C5341302FD");
 	}
 
 	const decrementAsync = async (): Promise<void> => {
@@ -51,8 +42,6 @@ export const useSignalState = () => {
 			await connection.current.start();
 
 		connection.current.send("DecrementCounter", counter.group);
-
-		dispatch(decrementAction());
 	}
 
 	const joinAsync = async (group: string): Promise<void> => {
