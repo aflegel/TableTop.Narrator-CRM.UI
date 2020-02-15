@@ -1,62 +1,33 @@
-import React, { useState } from 'react';
-import Button from '@material-ui/core/Button';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { useSignalState } from "./Hooks/SignalState";
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
+import React from 'react';
+import CompanyHome from "./Components/CompanyHome"
+import { Switch, BrowserRouter, Link, Route } from 'react-router-dom';
 
-const useStyles = makeStyles((theme: Theme) =>
-	createStyles({
-		card: {
-			maxWidth: 345
-		},
-		textField: {
-			marginLeft: theme.spacing(1),
-			marginRight: theme.spacing(1),
-			width: 200
-		}
-	}),
-);
 
-interface State {
-	group: string;
+const Index: React.FC = () => {
+	return <h2>Home</h2>;
+}
+
+
+const CompanyIndexComponent: React.FC = () => {
+
+	return (<div>Company index page</div>
+	);
 }
 
 const App: React.FC = () => {
-	const classes = useStyles();
-	const { counter, incrementAsync, decrementAsync, joinAsync, leaveAsync } = useSignalState();
 
-	const [values, setValues] = useState<State>({
-		group: "Cat in the Hat",
-	});
+	return (<BrowserRouter><div>Test App</div>
+		<Link to="/">Home</Link><br />
 
-	const handleChange = (name: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-		setValues({ ...values, [name]: event.target.value });
-	};
+		<Link to="/company/">Company Index</Link><br />
+		<Link to="/83F023E9-B743-4525-97B8-D6C5341302FD/">Named Company GUID</Link><br />
+		<Switch>
+			<Route path="/" exact component={Index} />
+			<Route path="/company/" exact component={CompanyIndexComponent} />
+			<Route path="/:id/" exact component={CompanyHome} />
+		</Switch>
 
-	return (<Card className={classes.card}>
-		<CardActionArea>
-			<CardContent>
-				<Typography gutterBottom variant="h5" component="h2">Current Count</Typography>
-				<Typography variant="body2" color="textSecondary" component="p">{counter.counter}</Typography>
-				<form noValidate autoComplete="off">
-					<TextField id="standard-name" label="Name" className={classes.textField} value={values.group} margin="normal" onChange={handleChange("group")} />
-				</form>
-			</CardContent>
-		</CardActionArea>
-		<CardActions>
-			<Button size="small" color="primary" onClick={() => incrementAsync()}>Increment</Button>
-			<Button size="small" color="primary" onClick={() => decrementAsync()}>Decrement</Button>
-
-			<Button size="small" color="primary" onClick={() => joinAsync(values.group)}>Join</Button>
-			<Button size="small" color="primary" onClick={() => leaveAsync(values.group)}>Leave</Button>
-		</CardActions>
-	</Card>
-	);
+	</BrowserRouter>);
 }
 
 export default App;
