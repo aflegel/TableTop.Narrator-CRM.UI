@@ -1,22 +1,20 @@
-import { useReducer, useRef, useEffect, useCallback } from "react";
-import { Reducer, InitialState } from "./Reducer";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { HubConnection } from "@aspnet/signalr";
-import { recieveAction } from "./Actions/Recieve";
-import { transmitAction } from "./Actions/Transmit";
 
-export const useSignalREndpoint = <TRecieve, TTransmit>(hubConnection: HubConnection, endpoint: string) => {
-	const [message, dispatch] = useReducer(Reducer, InitialState);
+export const useSignalREndpoint = <TRecieve, TTransmit>(hubConnection: HubConnection, endpoint: string):
+	[TRecieve | undefined, (payload: TTransmit) => void] => {
+
+	const [message, dispatch] = useState<TRecieve>();
 
 	const connection = useRef(hubConnection);
 
-	const listener = useCallback(data => dispatch(recieveAction<TRecieve>(data)), []);
+	const listener = useCallback(data => dispatch(data), []);
 
-	useEffect(() => connection.current.on(endpoint, listener), [listener]);
+	useEffect(() => connection.current.on(endpoint, listener), [endpoint, listener]);
 
-	const transmitAsync = async (payload: TTransmit): Promise<void> => {
+	const transmit = (payload: TTransmit): void => {
 		connection.current.send(endpoint, payload);
-		dispatch(transmitAction(payload));
-	}
+	};
 
-	return [message, transmitAsync];
+	return [message, transmit];
 };
