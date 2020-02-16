@@ -50,7 +50,7 @@ const CompanyComponent: React.FC = () => {
 			</CardContent>
 		</CardActionArea>
 		<CardActions>
-			<Button size="small" color="primary" onClick={() => incrementAsync()}>Increment</Button>
+			<Button size="small" color="primary" onClick={() => joinAsync(1)}>Increment</Button>
 			<Button size="small" color="primary" onClick={() => decrementAsync()}>Decrement</Button>
 
 		</CardActions>
