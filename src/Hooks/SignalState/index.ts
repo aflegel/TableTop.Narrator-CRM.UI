@@ -1,51 +1,23 @@
 import { useReducer, useRef, useEffect, useCallback } from "react";
+import { HubConnectionBuilder } from "@aspnet/signalr";
 import { Reducer } from "./Reducer";
 import { InitialState } from "./State";
-import { HubConnectionBuilder } from "@aspnet/signalr";
 import { decrementAction } from "./Actions/Decrement";
-import { useSignalREndpoint } from "../SignalR/Hook";
+import { incrementAction } from "./Actions/Increment";
+import { useSignalREndpoint } from "../SignalR/SignalREndpoint";
 
-export const useSignalState = (baseUrl: string) => {
+export const useSignalState = (baseUrl: string, companyId: string) => {
 	const [counter, dispatch] = useReducer(Reducer, InitialState);
 
-	const connection = useRef(new HubConnectionBuilder().withUrl(`${baseUrl}/sync`).build());
+	const connection = useRef(new HubConnectionBuilder().withUrl(baseUrl).build());
 
-	const [, joinAsync] = useSignalREndpoint<number, number | string>(connection.current, "JoinGroup");
-	const [, leaveAsync] = useSignalREndpoint<number, number>(connection.current, "LeaveGroup");
+	const [increase, incrementAsync] = useSignalREndpoint<number, number>(connection, "Increment", companyId);
+	const [decrease, decrementAsync] = useSignalREndpoint<number, number>(connection, "Decrement", companyId);
 
-	const companyId = "83F023E9-B743-4525-97B8-D6C5341302FD";
+	const listener = useCallback((data: number, increase: boolean) => dispatch(increase ? incrementAction(data) : decrementAction(data)), [dispatch]);
 
-	const startConnection = async () => {
-		await connection.current.start();
+	useEffect(() => { if (increase) listener(increase, true); }, [increase, listener]);
+	useEffect(() => { if (decrease) listener(decrease, false); }, [decrease, listener]);
 
-		await connection.current.send("Join", companyId);
-	}
-
-	const incrementListener = useCallback(data => console.log(data), []);
-
-	useEffect(() => connection.current.on("Sync", incrementListener), [incrementListener]);
-
-	const decrementListener = useCallback(() => dispatch(decrementAction()), []);
-
-	useEffect(() => connection.current.on("DecrementCounter", decrementListener), [decrementListener]);
-
-	const timeListener = useCallback(data => console.log(data), []);
-
-	useEffect(() => connection.current.on("Time", timeListener), [timeListener]);
-
-	const incrementAsync = async (): Promise<void> => {
-		if (connection.current.state !== "Connected")
-			await startConnection();
-
-		connection.current.send("Update", "83F023E9-B743-4525-97B8-D6C5341302FD");
-	}
-
-	const decrementAsync = async (): Promise<void> => {
-		if (connection.current.state !== "Connected")
-			await startConnection();
-
-		connection.current.send("DecrementCounter", counter.group);
-	}
-
-	return { counter, incrementAsync, decrementAsync, joinAsync, leaveAsync };
+	return { counter, increase, decrease, incrementAsync, decrementAsync };
 };

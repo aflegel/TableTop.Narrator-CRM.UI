@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useSignalState } from "../Hooks/SignalState";
@@ -7,7 +7,7 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
+import { useRouteMatch } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -22,37 +22,28 @@ const useStyles = makeStyles((theme: Theme) =>
 	}),
 );
 
-interface State {
-	group: string;
+interface IdRoute {
+	id: string;
 }
 
 const CompanyComponent: React.FC = () => {
 	const classes = useStyles();
-	const { counter, incrementAsync, decrementAsync, joinAsync, leaveAsync } = useSignalState("http://localhost:5100/encounter");
-	useSignalState("http://localhost:5100/company");
+	const match = useRouteMatch<IdRoute>("/company/:id/card/");
+	const id = match ? match.params.id || "" : "";
 
-	const [values, setValues] = useState<State>({
-		group: "Cat in the Hat",
-	});
-
-	const handleChange = (name: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-		setValues({ ...values, [name]: event.target.value });
-	};
+	const { counter, increase, decrease, incrementAsync, decrementAsync } = useSignalState("http://localhost:5100/encounter/sync", id);
 
 	return (<Card className={classes.card}>
 		<CardActionArea>
 			<CardContent>
-				<Typography gutterBottom variant="h5" component="h2">Current Count</Typography>
-				<Typography variant="body2" color="textSecondary" component="p">{counter.counter}</Typography>
-				<form noValidate autoComplete="off">
-					<TextField id="standard-name" label="Name" className={classes.textField} value={values.group} margin="normal" onChange={handleChange("group")} />
-				</form>
+				<Typography gutterBottom variant="h5" component="h2">{id}</Typography>
+				<Typography variant="body2" color="textSecondary" component="p">Current: {counter.counter}</Typography>
+				<Typography variant="body2" color="textSecondary" component="p">Change: {increase} or {decrease}</Typography>
 			</CardContent>
 		</CardActionArea>
 		<CardActions>
-			<Button size="small" color="primary" onClick={() => joinAsync(1)}>Increment</Button>
-			<Button size="small" color="primary" onClick={() => decrementAsync()}>Decrement</Button>
-
+			<Button size="small" color="primary" onClick={() => incrementAsync(counter.counter || 2)}>Increment</Button>
+			<Button size="small" color="primary" onClick={() => decrementAsync(Math.floor(counter.counter / 2))}>Decrement</Button>
 		</CardActions>
 	</Card>
 	);

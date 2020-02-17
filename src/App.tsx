@@ -13,7 +13,7 @@ import Container from '@material-ui/core/Container';
 const Index: React.FC = () => <h2>Home</h2>;
 
 const CompanyIndexComponent: React.FC = () =>
-	(<div>Company index page<Link to="/83F023E9-B743-4525-97B8-D6C5341302FD/">Named Company GUID</Link></div>);
+	(<div>Company index page<Link to="/company/83F023E9-B743-4525-97B8-D6C5341302FD/">Named Company GUID</Link></div>);
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -57,7 +57,7 @@ const App: React.FC = () => {
 					<Switch>
 						<Route path="/" exact component={Index} />
 						<Route path="/company/" exact component={CompanyIndexComponent} />
-						<Route path="/:id/" exact component={CompanyHome} />
+						<Route path="/company/:id/" component={CompanyHome} />
 					</Switch>
 				</Typography>
 				<Drawer open={state} onClose={toggleDrawer(false)}>
