@@ -1,5 +1,5 @@
 import React from 'react';
-import CompanyHome from "./Components/CompanyHome"
+import { CompanyHome } from "./Components/Company"
 import { Switch, BrowserRouter, Link, Route } from 'react-router-dom';
 import { AppBar, IconButton, Toolbar, Typography, Button, } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
 	}),
 );
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
 	const classes = useStyles();
 	const [state, setState] = React.useState(false);
 
@@ -73,5 +73,3 @@ const App: React.FC = () => {
 			</Container>
 		</BrowserRouter>);
 }
-
-export default App;

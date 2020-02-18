@@ -1,52 +1,41 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { useSignalState } from "../Hooks/SignalState";
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import { useRouteMatch } from 'react-router';
+import { BrowserRouter, Link, Route, useRouteMatch } from 'react-router-dom';
+import { Counter } from './Counter';
+import { CompanyContext } from "./CompanyContext";
+import { Company } from '../Models/Company';
+import { trimUrl } from "../Utilities/UrlUtilities";
 
-const useStyles = makeStyles((theme: Theme) =>
-	createStyles({
-		card: {
-			maxWidth: 345
-		},
-		textField: {
-			marginLeft: theme.spacing(1),
-			marginRight: theme.spacing(1),
-			width: 200
-		}
-	}),
-);
+const Transaction: React.FC = () => (<div>Transaction</div>);
 
 interface IdRoute {
 	id: string;
 }
 
-const CompanyComponent: React.FC = () => {
-	const classes = useStyles();
-	const match = useRouteMatch<IdRoute>("/company/:id/card/");
+export const CompanyHome: React.FC = () => {
+	const match = useRouteMatch<IdRoute>("/company/:id/");
 	const id = match ? match.params.id || "" : "";
+	const trimmedUrl = trimUrl(match ? match.url : "");
 
-	const { counter, increase, decrease, incrementAsync, decrementAsync } = useSignalState("http://localhost:5100/encounter/sync", id);
+	//todo: pull from api
+	const company: Company = {
+		companyId: id,
+		name: "I made this up",
+		description: "",
+		loots: [],
+		characters: [],
+		encounters: []
+	};
 
-	return (<Card className={classes.card}>
-		<CardActionArea>
-			<CardContent>
-				<Typography gutterBottom variant="h5" component="h2">{id}</Typography>
-				<Typography variant="body2" color="textSecondary" component="p">Current: {counter.counter}</Typography>
-				<Typography variant="body2" color="textSecondary" component="p">Change: {increase} or {decrease}</Typography>
-			</CardContent>
-		</CardActionArea>
-		<CardActions>
-			<Button size="small" color="primary" onClick={() => incrementAsync(counter.counter || 2)}>Increment</Button>
-			<Button size="small" color="primary" onClick={() => decrementAsync(Math.floor(counter.counter / 2))}>Decrement</Button>
-		</CardActions>
-	</Card>
+	return (<BrowserRouter>
+		<CompanyContext.Provider value={company}>
+			<div>Company Home</div>
+
+			<Link to={`${trimmedUrl}/transaction/`}>transactions</Link><br />
+			<Link to={`${trimmedUrl}/card/`}>card</Link><br />
+
+			<Route path={`${trimmedUrl}}/transaction/`} exact component={Transaction} />
+			<Route path={`${trimmedUrl}/card/`} exact component={Counter} />
+		</CompanyContext.Provider>
+	</BrowserRouter>
 	);
-}
-
-export default CompanyComponent;
+};
