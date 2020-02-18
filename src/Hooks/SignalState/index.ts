@@ -11,8 +11,8 @@ export const useSignalState = (baseUrl: string, companyId: string) => {
 
 	const connection = useRef(new HubConnectionBuilder().withUrl(baseUrl).build());
 
-	const [increase, incrementAsync] = useSignalREndpoint<number, number>(connection, "Increment", companyId);
-	const [decrease, decrementAsync] = useSignalREndpoint<number, number>(connection, "Decrement", companyId);
+	const [increase, incrementAsync] = useSignalREndpoint<number, number>(connection, "Increment", companyId, 0);
+	const [decrease, decrementAsync] = useSignalREndpoint<number, number>(connection, "Decrement", companyId, 0);
 
 	const listener = useCallback((data: number, increase: boolean) => dispatch(increase ? incrementAction(data) : decrementAction(data)), [dispatch]);
 

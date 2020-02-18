@@ -1,11 +1,12 @@
 import { useEffect, useCallback, useState } from "react";
 import { HubConnection } from "@aspnet/signalr";
 
-export const useSignalREndpoint = <TRecieve, TTransmit>(connection: React.MutableRefObject<HubConnection>, endpoint: string, companyId: string): [TRecieve | undefined, (payload: TTransmit) => Promise<void>] => {
+export const useSignalREndpoint = <TRecieve, TTransmit>(connection: React.MutableRefObject<HubConnection>, endpoint: string, companyId: string, initial: TRecieve): [TRecieve, (payload: TTransmit) => Promise<void>] => {
 
-	const [message, setMessage] = useState<TRecieve>();
+	const [message, setMessage] = useState<TRecieve>(initial);
 
 	const listener = useCallback(data => {
+		// eslint-disable-next-line no-undef
 		console.log(endpoint, data);
 		setMessage(data);
 	}, [endpoint, setMessage]);
