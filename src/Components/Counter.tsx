@@ -26,14 +26,13 @@ const useStyles = makeStyles((theme: Theme) =>
 export const Counter: React.FC = () => {
 	const classes = useStyles();
 	const companyContext = useContext(CompanyContext);
-	const { counter, increase, decrease, incrementAsync, decrementAsync } = useSignalState("http://localhost:5100/encounter/sync", companyContext.companyId);
+	const { counter, incrementAsync, decrementAsync } = useSignalState("http://localhost:5100/encounter/sync", companyContext.companyId);
 
 	return (<Card className={classes.card}>
 		<CardActionArea>
 			<CardContent>
 				<Typography gutterBottom variant="h5" component="h2">{companyContext.companyId}</Typography>
 				<Typography variant="body2" color="textSecondary" component="p">Current: {counter.counter}</Typography>
-				<Typography variant="body2" color="textSecondary" component="p">Change: {increase} or {decrease}</Typography>
 			</CardContent>
 		</CardActionArea>
 		<CardActions>
