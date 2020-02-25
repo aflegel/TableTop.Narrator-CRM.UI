@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const Counter: React.FC = () => {
 	const classes = useStyles();
 	const companyContext = useContext(CompanyContext);
-	const { counter, incrementAsync, decrementAsync } = useCounter("http://localhost:5100/encounter/sync", companyContext.companyId);
+	const { counter, incrementAsync, decrementAsync } = useCounter(companyContext.companyId);
 
 	return (<Card className={classes.card}>
 		<CardActionArea>

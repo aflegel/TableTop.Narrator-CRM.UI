@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { HubConnection } from "@aspnet/signalr";
 
 export const useSignalREndpoint = <TRecieve, TTransmit>(connection: React.MutableRefObject<HubConnection>, endpoint: string, companyId: string, callback?: (payload: TRecieve) => void): (payload: TTransmit) => Promise<void> => {
@@ -10,13 +10,6 @@ export const useSignalREndpoint = <TRecieve, TTransmit>(connection: React.Mutabl
 		if (internalCallback.current) internalCallback.current(data);
 	}, [endpoint, internalCallback]);
 
-	//todo: move this logic into a separate hook
-	const startConnection = async (companyId: string) => {
-		await connection.current.start();
-
-		await connection.current.send("Join", companyId);
-	};
-
 	useEffect(() => {
 		connection.current.on(endpoint, listener)
 
@@ -24,9 +17,10 @@ export const useSignalREndpoint = <TRecieve, TTransmit>(connection: React.Mutabl
 	}, [connection, endpoint, listener]);
 
 	const transmit = async (payload: TTransmit): Promise<void> => {
-		if (connection.current.state !== "Connected")
-			await startConnection(companyId);
-		connection.current.send(endpoint, companyId, payload);
+		if (connection.current.state === "Connected")
+			connection.current.send(endpoint, companyId, payload);
+		else
+			console.log("SignalR connection is not ready");
 	};
 
 	return transmit;
