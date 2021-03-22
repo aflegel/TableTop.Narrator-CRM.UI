@@ -1,4 +1,4 @@
-import { useReducer, useRef, useEffect, useCallback, useState } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { HubConnectionBuilder } from "@aspnet/signalr";
 import { useSignalREndpoint } from "./SignalREndpoint";
 
@@ -22,34 +22,24 @@ export const useSignalState = (baseUrl: string, companyId: string) => {
     new HubConnectionBuilder().withUrl(baseUrl).build()
   );
 
-  const [increase, incrementAsync] = useSignalREndpoint<number, number>(
+  const incrementAsync = useSignalREndpoint<number, number>(
     connection,
     "Increment",
     companyId,
-    0
+    (data) => setCounter({
+      ...counter,
+      counter: counter.counter + data,
+    })
   );
-  const [decrease, decrementAsync] = useSignalREndpoint<number, number>(
+  const decrementAsync= useSignalREndpoint<number, number>(
     connection,
     "Decrement",
     companyId,
-    0
+    (data) => setCounter({
+      ...counter,
+      counter: counter.counter - data,
+    })
   );
 
-  const listener = useCallback(
-    (data: number, increase: boolean) =>
-      setCounter({
-        ...counter,
-        counter: increase ? counter.counter + data : counter.counter - data,
-      }),
-    [setCounter]
-  );
-
-  useEffect(() => {
-    if (increase) listener(increase, true);
-  }, [increase, listener]);
-  useEffect(() => {
-    if (decrease) listener(decrease, false);
-  }, [decrease, listener]);
-
-  return { counter, increase, decrease, incrementAsync, decrementAsync };
+  return { counter, incrementAsync, decrementAsync };
 };
