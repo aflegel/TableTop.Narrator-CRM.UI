@@ -1,5 +1,5 @@
-import { useEffect, useCallback, useState, useRef } from "react";
-import { HubConnection } from "@aspnet/signalr";
+import { useEffect, useCallback, useRef } from "react";
+import { HubConnection } from "@microsoft/signalr";
 
 export const useSignalREndpoint = <TRecieve, TTransmit>(connection: React.MutableRefObject<HubConnection>, endpoint: string, companyId: string, callback?: (payload: TRecieve) => void): (payload: TTransmit) => Promise<void> => {
 	const internalCallback = useRef(callback);
